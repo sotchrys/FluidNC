@@ -404,6 +404,14 @@ static void write_limit_set(uint32_t mask, Channel& out) {
         out << (bitnum_is_true(mask, Machine::Axes::motor_bit(axis, 1)) ? char(motor1AxisName[axis]) : ' ');
     }
 }
+static Error show_limit_transitions(const char* value, WebUI::AuthenticationLevel auth_level, Channel& out) {
+    struct LimitEvent evt;
+    while (xQueueReceive(limit_sw_queue, &evt, 0)) {
+        out << Machine::Axes::_names[evt.axis] << int(evt.motor) << " Limit " << (evt.value ? "ON" : "off") << '\n';
+    }
+    return Error::Ok;
+}
+
 static Error show_limits(const char* value, WebUI::AuthenticationLevel auth_level, Channel& out) {
     out.print("Send ! to exit\n");
     out.print("Homing Axes: ");
@@ -709,6 +717,7 @@ void make_user_commands() {
     new UserCommand("$", "GrblSettings/List", report_normal_settings, cycleOrHold);
     new UserCommand("L", "GrblNames/List", list_grbl_names, cycleOrHold);
     new UserCommand("Limits", "Limits/Show", show_limits, cycleOrHold);
+    new UserCommand("LT", "LimitTransitions/Show", show_limit_transitions, cycleOrHold);
     new UserCommand("S", "Settings/List", list_settings, cycleOrHold);
     new UserCommand("SC", "Settings/ListChanged", list_changed_settings, cycleOrHold);
     new UserCommand("CMD", "Commands/List", list_commands, cycleOrHold);

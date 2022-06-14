@@ -45,6 +45,11 @@ namespace Machine {
 
     void IRAM_ATTR LimitPin::handleISR() {
         read();
+        struct LimitEvent evt;
+        evt.axis  = _axis;
+        evt.motor = _motorNum;
+        evt.value = _value;
+        xQueueSendFromISR(limit_sw_queue, &evt, NULL);
         if (sys.state != State::Alarm && sys.state != State::ConfigAlarm && sys.state != State::Homing) {
             if (_pHardLimits && rtAlarm == ExecAlarm::None) {
 #if 0
@@ -97,10 +102,29 @@ namespace Machine {
         if (_pin.capabilities().has(Pins::PinCapabilities::PullUp)) {
             attr = attr | Pin::Attr::PullUp;
         }
+        if (_posLimits) {
+            log_debug("pos " << String(*_posLimits, 16));
+        }
+        if (_negLimits) {
+            log_debug("Neg " << String(*_negLimits, 16));
+        }
+
         _pin.setAttr(attr);
         _pin.attachInterrupt(ISRHandler, CHANGE, this);
 
+        if (_posLimits) {
+            log_debug("pos " << String(*_posLimits, 16));
+        }
+        if (_negLimits) {
+            log_debug("Neg " << String(*_negLimits, 16));
+        }
         read();
+        if (_posLimits) {
+            log_debug("pos " << String(*_posLimits, 16));
+        }
+        if (_negLimits) {
+            log_debug("Neg " << String(*_negLimits, 16));
+        }
     }
 
     // Make this switch act like an axis level switch. Both motors will report the same

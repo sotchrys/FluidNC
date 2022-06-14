@@ -40,3 +40,11 @@ bool limitsCheckTravel(float* target);
 // so you cannot tell which one is triggered.  In that case, automatic
 // pull-off is impossible.
 bool ambiguousLimit();
+
+struct LimitEvent {
+    char axis;
+    char motor;
+    bool value;
+};
+
+extern xQueueHandle limit_sw_queue;  // used by limit switch debouncing

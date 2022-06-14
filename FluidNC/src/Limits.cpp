@@ -17,6 +17,9 @@
 xQueueHandle limit_sw_queue;  // used by limit switch debouncing
 
 void limits_init() {
+    if (limit_sw_queue == NULL) {
+        limit_sw_queue = xQueueCreate(100, sizeof(int));
+    }
 #ifdef LATER  // We need to rethink debouncing
     if (Machine::Axes::limitMask) {
         if (limit_sw_queue == NULL && config->_softwareDebounceMs != 0) {
