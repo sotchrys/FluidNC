@@ -46,6 +46,7 @@ namespace Machine {
     void IRAM_ATTR LimitPin::handleISR() {
         read();
         struct LimitEvent evt;
+        evt.time  = getCpuTicks();
         evt.axis  = _axis;
         evt.motor = _motorNum;
         evt.value = _value;

@@ -42,9 +42,11 @@ bool limitsCheckTravel(float* target);
 bool ambiguousLimit();
 
 struct LimitEvent {
-    char axis;
-    char motor;
-    bool value;
+    uint8_t axis;
+    uint8_t motor;
+    uint8_t dummy;
+    bool    value;
+    int32_t time;
 };
 
 extern xQueueHandle limit_sw_queue;  // used by limit switch debouncing

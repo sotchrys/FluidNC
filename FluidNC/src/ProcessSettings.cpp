@@ -405,9 +405,13 @@ static void write_limit_set(uint32_t mask, Channel& out) {
     }
 }
 static Error show_limit_transitions(const char* value, WebUI::AuthenticationLevel auth_level, Channel& out) {
+    static int32_t    timestamp;
     struct LimitEvent evt;
     while (xQueueReceive(limit_sw_queue, &evt, 0)) {
-        out << Machine::Axes::_names[evt.axis] << int(evt.motor) << " Limit " << (evt.value ? "ON" : "off") << '\n';
+        uint32_t deltat = evt.time - timestamp;
+        timestamp       = evt.time;
+        out << Machine::Axes::_names[evt.axis] << int(evt.motor) << " Limit " << (evt.value ? "ON " : "off") << " + "
+            << (deltat / g_ticks_per_us_pro) << " us \n";
     }
     return Error::Ok;
 }

@@ -77,6 +77,8 @@ void setup() {
 
             plan_init();
 
+            limits_init();
+
             config->_userOutputs->init();
 
             config->_axes->init();
@@ -101,8 +103,6 @@ void setup() {
             } else {
                 sys.state = State::Idle;
             }
-
-            limits_init();
 
             // Check for power-up and set system alarm if homing is enabled to force homing cycle
             // by setting alarm state. Alarm locks out all g-code commands, including the
